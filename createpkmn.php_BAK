@@ -1,0 +1,170 @@
+<?php
+session_start();
+
+/**ToDo:
+ * Einlesen in display: flex
+ * Unterschied zwischen display block, flex, inline, inline-block
+ * Media Queries in CSS
+ * Borderradius, rendern, Seite designen
+ * Selektoren, Placeholder
+ */
+
+/**
+ * User soll eine eingabemaske sehen
+ * In dieser soll er ein Pokemon anlegen können und folgende eigenschaften Anlegen können:
+ *  Pokedexnummer, Name des Pokemon, Typ, Größe, Gewicht OPTIONAL: Ein Bild des Pokemon
+ * Sollte der Name oder die Pokemonnummer bereits vergeben sein soll eine Fehlermeldung ausgegeben werden und das Pokemon soll stattdessen abgerufen werden können
+ */
+var_dump($_POST);
+$error = array();
+if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
+    $dbPokedex = new mysqli('db','root','root','pokedex');
+    $stmtGetPkmnInfo = $dbPokedex->prepare("SELECT * FROM pokemon WHERE nummer=? AND name=?");
+    $stmtGetPkmnInfo->bind_param("is", $_POST['pkmnnummer'], $_POST['pkmnname']);
+    $stmtGetPkmnInfo->execute();
+    $resultSet = $stmtGetPkmnInfo->get_result();
+    $result = $resultSet->fetch_assoc();
+    if (is_array($result)){
+        $error['error'] = "pkmnexists";
+        foreach ($result as $value){
+            echo $value;
+        }
+    }else{
+        $stmtSetPkmnInfo = $dbPokedex->prepare("INSERT INTO pokedex.pokemon (nummer, name, groesse, gewicht) VALUES (?,?,?,?)");
+        $stmtSetPkmnInfo->bind_param("isii",$_POST['pkmnnummer'],$_POST['pkmnname'],$_POST['pkmngroesse'],$_POST['pkmngewicht']);
+        $stmtSetPkmnInfo->execute();
+        $stmtGetPkmnInfo->execute();
+        $resultSet = $stmtGetPkmnInfo->get_result();
+        $result = $resultSet->fetch_assoc();
+        $_POST['createpkmn'] = '3';
+    }
+}
+
+?>
+<html>
+    <head>
+    <style>
+        .flex-box {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .flex-items{
+            flex-grow: 2;
+            flex-basis: auto;
+        }
+        table, td, th {
+            border: 1px solid black;
+            text-align: center;
+        }
+        .DexColours{
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to bottom right,red, whitesmoke);
+            background-size: cover;
+            background-position: center center;
+        }
+
+    </style>
+        <body>
+    <?php if (!array_key_exists('createpkmn', $_POST) || $_POST['createpkmn'] === '2'): ?>
+    <form method="post">
+    <div>
+        <h1 style="text-align: center" class="DexColours">Willkommen im Pokedex-Log! Hier kannst du neu entdeckte Pokemon anlegen!</h1>
+    </div>
+    <div class="flex-box">
+       <div class="flex-items">
+            <label for="pkmnnummer">Pokedex-Nummer:</label>
+            <input type="number" " id="pkmnnummer" name="pkmnnummer"></input>
+        </div>
+        <div class="flex-items">
+            <label for="pkmnname">Name des Pokemon:</label>
+            <input for="name" id="pkmnname" name="pkmnname"></input>
+        </div>
+        <div class="flex-items">
+            <label for="pkmntyp">Typ:
+            <select type="text" name="pkmntyp">
+                <option value="NULL"></option>
+                <option value="Normal">Normal</option>
+                <option value="Feuer">Feuer</option>
+                <option value="Wasser">Wasser</option>
+                <option value="Elektro">Elektro</option>
+                <option value="Pflanze">Pflanze</option>
+                <option value="Flug">Flug</option>
+                <option value="Käfer">Käfer</option>
+                <option value="Gift">Gift</option>
+                <option value="Gestein">Gestein</option>
+                <option value="Boden">Boden</option>
+                <option value="Kampf">Kampf</option>
+                <option value="Eis">Eis</option>
+                <option value="Psycho">Psycho</option>
+                <option value="Geist">Geist</option>
+                <option value="Drache">Drache</option>
+            </select></label>
+        </div>
+            <label for="pkmngroesse">Größe in cm:</label>
+            <input  type="number" id="pkmngroesse" name="pkmngroesse">
+            <div class="flex-items">
+                <label for="pkmngewicht">Gewicht in kg</label>
+                <input type="number" id="pkmngewicht" name="pkmngewicht">
+            </div>
+    </div>
+
+        <input type="hidden" name="createpkmn" value="1">
+        <button type="submit">Im Pokedex eintragen</button>
+    <?php elseif ($_POST['createpkmn'] === '3'): ?>
+        <span>
+            <div>
+            <h1 style="color: dodgerblue">Das Pokemon wurde erfolgreich angelegt!</h1>
+            </div>
+            <h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nummer:</th> <th>Name:</th> <th>Größe:</th> <th>Gewicht:</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><?php echo '#'.$result['nummer']?></td> <td><?php echo $result['name']?></td><td><?php echo $result['groesse'].'cm' ?></td> <td><?php echo $result['gewicht'].'kg' ?></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </h2>
+            <h4>
+                <form method="post">
+                    <input type="hidden" name="createpkmn" value="2">
+                    <button type="submit">Möchtest du ein neues Pokémon anlegen?</button>
+                </form>
+            </h4>
+        </span>
+    <?php elseif (array_key_exists('createpkmn', $_POST) && array_key_exists('error', $error)): ?>
+        <span>
+            <div>
+            <h1 style="color: cornflowerblue">Das Pokemon ist bereits vorhanden</h1>
+            </div>
+            <h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nummer:</th> <th>Name:</th> <th>Größe:</th> <th>Gewicht:</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><?php echo '#'.$result['nummer']?></td> <td><?php echo $result['name']?></td><td><?php echo $result['groesse'].'cm' ?></td> <td><?php echo $result['gewicht'].'kg' ?></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </h2>
+            <h4>
+                <form method="post">
+                    <input type="hidden" name="createpkmn" value="2">
+                    <button type="submit">Möchtest du stattdessen ein neues Pokémon anlegen?</button>
+                </form>
+            </h4>
+        </span>
+    </form>
+    <?php endif; ?>
+    </body>
+    </head>
+</html>

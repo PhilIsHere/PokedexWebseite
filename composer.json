@@ -1,0 +1,20 @@
+{
+    "name": "phil/erstes-projekt",
+    "description": "Ist meine erste Webseite",
+    "type": "project",
+    "authors": [
+        {
+            "name": "PhilIsHere",
+            "email": "48513743+PhilIsHere@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "ext-mysqli": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

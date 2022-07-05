@@ -1,0 +1,41 @@
+body{
+    background-image: url("img/test.jpg");
+    background-repeat: no-repeat;
+    background-size: 50% 50%;
+    background-position: center;
+    background-color: aqua;
+}
+
+.flex-box {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-content: space-evenly;
+}
+.flex-items{
+    display: inherit;
+    flex-flow: column wrap;
+    justify-content: space-between;
+}
+label, h1{
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    color: white;
+}
+.register {
+    border: 2px solid black;
+}
+
+.flex {
+    display: flex;
+}
+
+.f-row {
+    flex-direction: row;
+}
+.f-col {
+    flex-direction: column;
+}
+.colour-error {
+    color: red;
+}
+
