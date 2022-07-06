@@ -1,7 +1,7 @@
 <?php
 
 use App\User;
-use App\Database;
+use App\Pokedex;
 
 include_once 'vendor/autoload.php';
 session_start(); //Startet eine Session und setzt sie als Cookie
@@ -21,7 +21,7 @@ if (array_key_exists('eingegeben', $_POST) && $_POST['eingegeben'] === '1'){
 //$username = $_POST['username'];
 //Prepared Statements nutzt man um Sicherheit und Performance zu erhöhen.
 //$username = "testname'; DELETE user WHERE 1=1;"; //Negativbeispiel, da mit den direkten Statements auch User direkt mit der DB kommunizieren können und Schaden anrichten  können.
-    $dbPokedex = new mysqli('db','root','root','pokedex'); //Speichere die Datenbank als Variable.
+    $dbPokedex = new Pokedex('db','root','root','pokedex'); //Speichere die Datenbank als Variable.
     $stmtGetUserInfo = $dbPokedex->prepare("SELECT * FROM user WHERE name=?"); //Erstelle ein neues prepared Statement.
     $stmtGetUserInfo->bind_param("s", $_POST['inputUsername']);//Für jeden im prepare angegebenen Fragezeichen muss ich den Rückgabetyp und eine Variable festlegen in der ein Wert gespeichert ist
     $stmtGetUserInfo->execute(); //Führe den prepared Statement mit dem gebundenen Parameter aus.

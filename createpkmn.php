@@ -21,6 +21,7 @@ include_once 'vendor/autoload.php';
 
 //$_GET = array('pkmnname' => 'Bisasam', 'pkmnnummer' => '1'); //DEBUG OPTION
 $dbPokedex = new Pokedex('db','root','root','pokedex');//Todo: ERINNERN: PHP NUR INNERHALB VOM DOCKER CONTAINER AUSFÜHRBAR!
+$check = array(); //Array für Bestätigungs- und Fehlermeldungen, benutzung als assoziiertes Array.
 if (!empty($_GET)) {
     $jsonresult = array();
     if (isset($_GET['pkmnname']) || isset($_GET['pkmnnummer'])) {
@@ -39,7 +40,7 @@ if (!empty($_GET)) {
     exit();
 }
 
-$check = array();
+
 if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
     $result = $dbPokedex->getPkmnInfo($_POST['pkmnnummer'], $_POST['pkmnname']);
     if (is_array($result)){
@@ -218,7 +219,7 @@ if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
             let inputFields = document.querySelectorAll('.inputfields');
             console.log(inputFields);
             for (let i =0; i < inputFields.length; i++){
-                inputFields[i].addEventListener('blur', function (lookUpPkmn){ //Todo: Anderen/Passenderen event finden, damit die Fehlermeldung bestehen bleibt
+                inputFields[i].addEventListener('change', function (lookUpPkmn){ //Todo: Anderen/Passenderen event finden, damit die Fehlermeldung bestehen bleibt
                     let pkmnnummer = document.getElementById('pkmnnummer')?.value;
                     let pkmname = document.querySelector('#pkmnname')?.value;
                     let httprequest = new XMLHttpRequest();
