@@ -66,6 +66,10 @@ if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
             display: block;
             border: 2px solid red;
         }
+        .textbox_success{
+            display: block;
+            border: 2px solid greenyellow;
+        }
         .flex-box {
             display: flex;
             flex-wrap: wrap;
@@ -219,7 +223,7 @@ if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
             let inputFields = document.querySelectorAll('.inputfields');
             console.log(inputFields);
             for (let i =0; i < inputFields.length; i++){
-                inputFields[i].addEventListener('change', function (lookUpPkmn){ //Todo: Anderen/Passenderen event finden, damit die Fehlermeldung bestehen bleibt
+                inputFields[i].addEventListener('blur', function (lookUpPkmn){ //Todo: Anderen/Passenderen event finden, damit die Fehlermeldung bestehen bleibt
                     let pkmnnummer = document.getElementById('pkmnnummer')?.value;
                     let pkmname = document.querySelector('#pkmnname')?.value;
                     let httprequest = new XMLHttpRequest();
@@ -229,32 +233,45 @@ if (array_key_exists('createpkmn', $_POST) && $_POST['createpkmn'] === '1'){
                             let response = JSON.parse(httprequest.response);
                             // console.log(httprequest.response);
                             if (response.status !== 'ok') {
-                                // document.getElementById('lookup').innerHTML += JSON.parse(httprequest.response).msg;
+
                                 let htmlElement = document.createElement('span');
                                 let inputBoxElement = document.getElementsByClassName('inputfields');
-                                // console.log(inputBoxElement);
-                                // for (let i = 0; i < inputBoxElement.length; i++){
-                                //     console.log(i,inputBoxElement[i]);
-                                // }
+                                let inputBoxElementCheck = document.querySelector('.textbox_success');
+                                if (inputBoxElementCheck){
+                                    inputBoxElement[i].classList.remove('inputBoxElementCheck');
+                                }
                                 inputBoxElement[i].classList.add('textbox_error');
                                 // let htmlElementErrorCheck = document.querySelector('.textbox_error');
                                 let htmlElementErrorCheck = document.querySelector('span.textbox_error');
                                 if(!htmlElementErrorCheck) {
+                                    console.log("In der Schleife, wo der Text eingeblendet und der Textrahmen rot werden soll")
                                     htmlElement.innerHTML = response.msg; //Todo: Errormessage an die richtige Stelle (Sprich: Oberhalb des Buttons)
                                     htmlElement.style.color = 'red';
                                     htmlElement.classList.add('textbox_error');
-                                    document.getElementById('lookup').appendChild(htmlElement);
+                                    document.getElementById('createButton').appendChild(htmlElement);
                                 }else {
-                                    document.getElementById('lookup').removeChild(htmlElementErrorCheck);
+                                    document.getElementById('createButton').removeChild(htmlElementErrorCheck);
+                                }
+                            }else {
+                                console.log("In der letzten Else schleife, wo es grün werden soll.");
+                                let inputBoxElement = document.getElementsByClassName('inputfields');
+                                inputBoxElement[i].classList.remove('textbox_error');
+                                inputBoxElement[i].classList.add('textbox_success');
+                                let htmlElementErrorCheck = document.querySelector('.textbox_error');
+                                if (htmlElementErrorCheck){
+                                document.getElementById('createButton').removeChild(htmlElementErrorCheck);
                                 }
                             }
+
                         }
-                    };
+                        }
                     // httprequest.open("GET", BASE_URL + '?pkmnname=' + pkmname + '&pkmnnummer=' + pkmnnummer );
                     httprequest.open("GET", `${BASE_URL}?pkmnname=${pkmname}&pkmnnummer=${pkmnnummer}` );
                     httprequest.send();
                 });
+
             }
+
 
             // 1. Eingabefeld aus dem Dom (Documentobjectmodel, der HTML-Struktur) herausholen
             let submitButtonId = document.getElementById('createButton');
